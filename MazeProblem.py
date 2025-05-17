@@ -1,43 +1,37 @@
-from collections import deque
-
-def find_path(maze):
+def find_path_dfs(maze):
     rows, cols = len(maze), len(maze[0])
-    start = (0, 0)
-    end = (rows - 1, cols - 1)
-
-    if maze[0][0] == 0 or maze[end[0]][end[1]] == 0:
-        return None  # No possible path if start or end are walls
-
-    # Directions: up, down, left, right
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-    queue = deque()
-    queue.append((start, [start]))  # (current position, path to current)
-
+    path = []
     visited = set()
-    visited.add(start)
 
-    while queue:
-        (x, y), path = queue.popleft()
+    def dfs(x, y):
+        if not (0 <= x < rows and 0 <= y < cols):
+            return False
+        if maze[x][y] == 0 or (x, y) in visited:
+            return False
+        path.append((x, y))
+        visited.add((x, y))
 
-        if (x, y) == end:
-            return mark_path(maze, path)
+        if (x, y) == (rows - 1, cols - 1):
+            return True
 
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
+        # Intentar moverse en todas las direcciones: abajo, derecha, arriba, izquierda
+        if dfs(x + 1, y) or dfs(x, y + 1) or dfs(x - 1, y) or dfs(x, y - 1):
+            return True
 
-            if (0 <= nx < rows and 0 <= ny < cols and
-                maze[nx][ny] == 1 and (nx, ny) not in visited):
-                queue.append(((nx, ny), path + [(nx, ny)]))
-                visited.add((nx, ny))
+        path.pop()  # Retroceder si no funciona ese camino
+        return False
 
-    return None  # No path found
+    if dfs(0, 0):
+        return mark_path(maze, path)
+    return None  # No se encontró camino
+
 
 def mark_path(maze, path):
     result = [['-' for _ in row] for row in maze]
     for x, y in path:
-        result[x][y] = 'S'
+        result[x][y] = 'x'
     return result
+
 
 def print_maze(solution):
     if solution:
@@ -45,6 +39,7 @@ def print_maze(solution):
             print(row)
     else:
         print("No path found.")
+
 
 if __name__ == '__main__':
     mazes = [
@@ -76,6 +71,6 @@ if __name__ == '__main__':
     ]
 
     for i, maze in enumerate(mazes, 1):
-        print(f"\nMaze {i} solution:")
-        solution = find_path(maze)
+        print(f"\nMaze {i}  solution:")
+        solution = find_path_dfs(maze)
         print_maze(solution)
