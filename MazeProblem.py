@@ -1,75 +1,76 @@
-"""
-Insert your code bellow 
+def find_path_dfs(maze):
+    rows, cols = len(maze), len(maze[0])
+    path = []
+    visited = set()
 
-our task is to implement an algorithm that can find the way out of a maze.
+    def dfs(x, y):
+        if not (0 <= x < rows and 0 <= y < cols):
+            return False
+        if maze[x][y] == 0 or (x, y) in visited:
+            return False
+        path.append((x, y))
+        visited.add((x, y))
 
-The maze representation is like this:
+        if (x, y) == (rows - 1, cols - 1):
+            return True
 
-    [
-      [1,1,1,1,1],
-      [1,0,0,1,1],
-      [1,1,0,1,1],
-      [1,1,0,0,0],
-      [1,1,1,1,1],
-    ]
+        # Intentar moverse en todas las direcciones: abajo, derecha, arriba, izquierda
+        if dfs(x + 1, y) or dfs(x, y + 1) or dfs(x - 1, y) or dfs(x, y - 1):
+            return True
 
-So we have a map like this
+        path.pop()  # Retroceder si no funciona ese camino
+        return False
 
-    integer 0 represents walls
-
-    integer 1 represents valid cells
-
-    cell (0,0) is the starting point (it is the top left corner)
-
-    the bottom right cell is the destination (so this is what we are looking for)
-
-So the solution should be something like this (S represents the states in the solution set):
-
-    [
-      [S,-,-,-,-],
-      [S,-,-,-,-],
-      [S,-,-,-,-],
-      [S,-,-,-,-],
-      [S,S,S,S,S],
-    ]
-
-Good luck!
+    if dfs(0, 0):
+        return mark_path(maze, path)
+    return None  # No se encontró camino
 
 
-"""
+def mark_path(maze, path):
+    result = [['-' for _ in row] for row in maze]
+    for x, y in path:
+        result[x][y] = 'x'
+    return result
+
+
+def print_maze(solution):
+    if solution:
+        for row in solution:
+            print(row)
+    else:
+        print("No path found.")
+
 
 if __name__ == '__main__':
-    ### Your code must succesfully solve the following mazes:
-    
-    m = [[1, 0, 0, 1],
+    mazes = [
+        [[1, 0, 0, 1],
          [1, 0, 0, 1],
          [1, 0, 0, 1],
-         [1, 1, 1, 1]
-         ]
+         [1, 1, 1, 1]],
 
-    easy_maze = [
-        [1, 1, 1, 0, 1],
-        [1, 0, 1, 0, 1],
-        [1, 0, 1, 1, 1],
-        [1, 1, 0, 0, 1],
-        [0, 1, 1, 1, 1]
+        [[1, 1, 1, 0, 1],
+         [1, 0, 1, 0, 1],
+         [1, 0, 1, 1, 1],
+         [1, 1, 0, 0, 1],
+         [0, 1, 1, 1, 1]],
+
+        [[1, 1, 0, 1, 1, 0],
+         [0, 1, 0, 1, 0, 1],
+         [1, 1, 1, 1, 1, 1],
+         [1, 0, 0, 0, 0, 0],
+         [1, 1, 1, 1, 1, 1],
+         [0, 0, 1, 0, 0, 1]],
+
+        [[1, 0, 1, 1, 1, 0, 1],
+         [1, 0, 1, 0, 1, 0, 1],
+         [1, 1, 1, 0, 1, 1, 1],
+         [0, 0, 1, 0, 0, 0, 0],
+         [1, 1, 1, 1, 1, 1, 1],
+         [1, 0, 0, 0, 0, 0, 1],
+         [1, 1, 1, 1, 1, 1, 1]]
     ]
 
-    medium_maze = [
-        [1, 1, 0, 1, 1, 0],
-        [0, 1, 0, 1, 0, 1],
-        [1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1],
-        [0, 0, 1, 0, 0, 1]
-    ]   
-    hard_maze = [
-        [1, 0, 1, 1, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1],
-        [1, 1, 1, 0, 1, 1, 1],
-        [0, 0, 1, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1]
-    ]
-
+    for i, maze in enumerate(mazes, 1):
+        print(f"\nMaze {i}  solution:")
+        solution = find_path_dfs(maze)
+        print_maze(solution)
